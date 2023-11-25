@@ -11,8 +11,7 @@ class Renderable {
   draw(camera: Camera) {
     let gl = GLSys.getGL();
     if (!this.mShader) throw new Error("Error getting shader");
-
-    this.mShader?.activate(this.mColor, this.mXform.getTRSMatrix(), camera.getCameraMatrix());
+    this.mShader.activate(this.mColor, this.mXform.getTRSMatrix(), camera.getCameraMatrix());
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 

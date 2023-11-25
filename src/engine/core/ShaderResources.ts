@@ -1,19 +1,30 @@
 import SimpleShader from "../SimpleShader";
-import { fragmentShaderSource } from "../../shaders/simple_fs";
-import { vertexShaderSource } from "../../shaders/simple_vs.js";
+import { text } from "../resources/index.js";
+import { pushPromise } from "./resourceMap.js";
 
 // Simple Shader
-let kSimpleVS = vertexShaderSource; // Path to the VertexShader
-let kSimpleFS = fragmentShaderSource; // Path to the simple FragmentShader
+const domain = "http://localhost:5173";
+
+const kSimpleFS = "/shaders/simple_fs.glsl"; // Path to the simple FragmentShader
+const kSimpleVS = "/shaders/simple_vs.glsl"; // Path to the simple FragmentShader
 
 export class ShaderResources {
   static mConstColorShader: SimpleShader | null = null;
   static init() {
-    console.log("does init called");
-    ShaderResources.createShaders();
-    console.log(ShaderResources.mConstColorShader);
-  }
+    const loadPromise = new Promise<void>(async (resolve) => {
+      await Promise.all([text.load(kSimpleVS), text.load(kSimpleFS)]);
+      resolve();
+    }).then(() => {
+      ShaderResources.createShaders();
+    });
 
+    pushPromise(loadPromise);
+  }
+  static cleanup() {
+    ShaderResources.mConstColorShader?.cleanup();
+    text.unload(kSimpleVS);
+    text.unload(kSimpleFS);
+  }
   static createShaders() {
     ShaderResources.mConstColorShader = new SimpleShader(kSimpleVS, kSimpleFS);
   }

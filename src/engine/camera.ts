@@ -24,16 +24,22 @@ class Camera {
     this.mWCCenter = wcCenter;
     this.mWCWidth = wcWidth;
     this.mViewport = viewportArray; // [x, y, width, height]
+
+    // Camera transform operator
+    this.mCameraMatrix = mat4.create();
   }
 
-  setWCCenter = (x: number, y: number) => (this.mWCCenter = vec2.fromValues(x, y));
+  setWCCenter = (x: number, y: number) => {
+    this.mWCCenter[0] = x;
+    this.mWCCenter[1] = y;
+  };
   getWCCenter = () => this.mWCCenter;
 
   setWCWidth = (width: number) => (this.mWCWidth = width);
   getWCWidth = () => this.mWCWidth;
 
   getWCHeight() {
-    const ratio = this.mViewport[eViewPort.eWidth] / this.mViewport[eViewPort.eHeight];
+    const ratio = this.mViewport[eViewPort.eHeight] / this.mViewport[eViewPort.eWidth];
     return this.getWCWidth() * ratio;
   }
 
@@ -59,7 +65,7 @@ class Camera {
     const center = this.getWCCenter();
 
     mat4.scale(this.mCameraMatrix, mat4.create(), vec3.fromValues(2.0 / this.getWCWidth(), 2.0 / this.getWCHeight(), 1.0));
-    mat4.translate(this.mCameraMatrix, this.mCameraMatrix, vec3.fromValues(-center[0], -center[1], 0.0));
+    mat4.translate(this.mCameraMatrix, this.mCameraMatrix, vec3.fromValues(-center[0], -center[1], 0));
   }
 }
 

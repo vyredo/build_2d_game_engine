@@ -1,6 +1,7 @@
 import { mat4 } from "../lib/gl-matrix";
 import { vertexBuffer } from "./core/VertexBuffer";
 import { GLSys } from "./core/gl";
+import { text } from "./resources";
 
 export class SimpleShader {
   private mCompiledShader: WebGLProgram | null = null;
@@ -8,20 +9,28 @@ export class SimpleShader {
   private mPixelColorRef: WebGLUniformLocation | null = null;
   private mModelMatrixRef: WebGLUniformLocation | null = null;
   private mCameraMatrixRef: WebGLUniformLocation | null = null;
+  private mVertexShader: WebGLShader | null = null;
+  private mFragmentShader: WebGLShader | null = null;
 
-  constructor(vertexShaderFilePath: string, fragmentShaderFilePath: string, { shouldFetch }: { shouldFetch?: boolean } = { shouldFetch: false }) {
-    let vertexShader: WebGLShader;
-    let fragmentShader: WebGLShader;
+  constructor(vertexShaderFilePath: string, fragmentShaderFilePath: string) {
     const gl = GLSys.getGL();
-    if (shouldFetch) {
-      // fetch over the network
-      vertexShader = this.loadAndCompileShaderFromFile(vertexShaderFilePath, gl.VERTEX_SHADER);
-      fragmentShader = this.loadAndCompileShaderFromFile(fragmentShaderFilePath, gl.FRAGMENT_SHADER);
-    } else {
-      vertexShader = this.loadAndCompileShader(vertexShaderFilePath, gl.VERTEX_SHADER);
-      fragmentShader = this.loadAndCompileShader(fragmentShaderFilePath, gl.FRAGMENT_SHADER);
-    }
-    this.init(vertexShader, fragmentShader);
+
+    this.mVertexShader = this.compileShader(vertexShaderFilePath, gl.VERTEX_SHADER);
+    this.mFragmentShader = this.compileShader(fragmentShaderFilePath, gl.FRAGMENT_SHADER);
+    this.init(this.mVertexShader, this.mFragmentShader);
+  }
+
+  cleanup() {
+    const gl = GLSys.getGL();
+    if (!this.mCompiledShader) throw new Error("Error getting compiled shader");
+    if (!this.mVertexShader) throw new Error("Error getting vertex shader");
+    if (!this.mFragmentShader) throw new Error("Error getting fragment shader");
+
+    gl.detachShader(this.mCompiledShader, this.mVertexShader);
+    gl.detachShader(this.mCompiledShader, this.mFragmentShader);
+    gl.deleteShader(this.mVertexShader);
+    gl.deleteShader(this.mFragmentShader);
+    gl.deleteProgram(this.mCompiledShader);
   }
 
   init(vertexShader: WebGLShader, fragmentShader: WebGLShader) {
@@ -51,8 +60,6 @@ export class SimpleShader {
     if (this.mVertexPositionRef == null) throw new Error("Error getting vertex position reference");
 
     const gl = GLSys.getGL();
-    console.log("activate");
-    console.log(this.mCompiledShader);
 
     gl.useProgram(this.mCompiledShader);
 
@@ -68,12 +75,14 @@ export class SimpleShader {
     gl.uniformMatrix4fv(this.mCameraMatrixRef, false, cameraMatrix);
   }
 
-  loadAndCompileShader(shaderSource: string, shaderType: GLenum) {
+  compileShader(filePath: string, shaderType: GLenum) {
     const gl = GLSys.getGL();
+
+    const shaderSource = text.get(filePath);
 
     // create shader object
     const shader = gl.createShader(shaderType);
-    if (shader == null) throw new Error("Error creating shader");
+    if (shader == null) throw new Error(`Error creating shader ${shaderSource}`);
 
     // load and compile shader source code
     gl.shaderSource(shader, shaderSource);
@@ -85,22 +94,6 @@ export class SimpleShader {
     }
 
     return shader;
-  }
-
-  loadAndCompileShaderFromFile(filePath: string, shaderType: GLenum) {
-    const xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("GET", filePath, false);
-    try {
-      xmlHttp.send();
-    } catch (error) {
-      throw new Error("Error loading shader file: " + filePath);
-    }
-
-    const shaderSource = xmlHttp.responseText;
-    console.log(shaderSource);
-    if (shaderSource == null) throw new Error("Error getting shader source from file: " + filePath);
-
-    return this.loadAndCompileShader(shaderSource, shaderType);
   }
 }
 

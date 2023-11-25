@@ -11,12 +11,14 @@ export class Transform {
     this.mRotationInRad = 0.0;
   }
 
-  setPosition(x: number, y: number) {
+  getPosition = () => this.mPosition;
+  setPosition = (x: number, y: number) => {
     this.setXPos(x);
     this.setYPos(y);
-  }
-  setXPos = (x: number) => (this.mPosition[0] = x);
+  };
+
   getXpos = () => this.mPosition[0];
+  setXPos = (x: number) => (this.mPosition[0] = x);
   incXPosBy = (delta: number) => (this.mPosition[0] += delta);
 
   getYpos = () => this.mPosition[1];
@@ -32,21 +34,21 @@ export class Transform {
   incHeightBy = (delta: number) => (this.mScale[1] += delta);
 
   getSize = () => this.mScale;
-  setSize(w: number, h: number) {
+  setSize = (w: number, h: number) => {
     this.setWidth(w);
     this.setHeight(h);
-  }
-  incSizeBy(delta: number) {
+  };
+  incSizeBy = (delta: number) => {
     this.incWidthBy(delta);
     this.incHeightBy(delta);
-  }
+  };
 
-  setRotationInRad(rotationInRadians: number) {
+  setRotationInRad = (rotationInRadians: number) => {
     this.mRotationInRad = rotationInRadians;
     while (this.mRotationInRad > 2 * Math.PI) {
       this.mRotationInRad -= 2 * Math.PI;
     }
-  }
+  };
 
   setRotationInDegree(rotationInDegree: number) {
     this.setRotationInRad((rotationInDegree * Math.PI) / 180.0);
@@ -64,10 +66,11 @@ export class Transform {
     let matrix = mat4.create(); // blank identity matrix
     // The matrices that WebGL uses are transposed, thus the typical matrix
     // operations must be in reverse.
-    mat4.translate(matrix, matrix, vec3.fromValues(this.getXpos(), this.getYpos(), 0.0));
 
+    mat4.translate(matrix, matrix, vec3.fromValues(this.getXpos(), this.getYpos(), 0.0));
     mat4.rotateZ(matrix, matrix, this.getRotationInRad());
     mat4.scale(matrix, matrix, vec3.fromValues(this.getWidth(), this.getHeight(), 1.0));
+
     return matrix;
   }
 }

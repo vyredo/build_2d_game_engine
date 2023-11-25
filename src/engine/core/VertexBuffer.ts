@@ -8,6 +8,12 @@ class VertexBuffer {
     this.mGLVertextBuffer = null;
   }
 
+  cleanup() {
+    if (this.mGLVertextBuffer == null) throw new Error("Error getting vertex buffer");
+    GLSys.getGL().deleteBuffer(this.mGLVertextBuffer);
+    this.mGLVertextBuffer = null;
+  }
+
   get() {
     return this.mGLVertextBuffer;
   }
