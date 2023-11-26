@@ -2,6 +2,7 @@ import SimpleShader from "../shaders/SimpleShader.js";
 import { text } from "../resources/index.js";
 import { TextureShader } from "../shaders/textureShader.js";
 import { pushPromise } from "./resourceMap.js";
+import { SpriteShader } from "../shaders/SpriteShader.js";
 
 // Simple Shader
 const domain = "http://localhost:5173";
@@ -14,6 +15,7 @@ const kTextureFS = "/shaders/texture_fs.glsl"; // Path to the texture FragmentSh
 export class ShaderResources {
   static mConstColorShader: SimpleShader | null = null;
   static mTextureShader: SimpleShader | null = null;
+  static mSpriteShader: SpriteShader | null = null;
 
   static init() {
     const loadPromise = new Promise<void>(async (resolve) => {
@@ -28,6 +30,7 @@ export class ShaderResources {
   static cleanup() {
     ShaderResources.mConstColorShader?.cleanup();
     ShaderResources.mTextureShader?.cleanup();
+    ShaderResources.mSpriteShader?.cleanup();
 
     text.unload(kSimpleVS);
     text.unload(kSimpleFS);
@@ -37,9 +40,9 @@ export class ShaderResources {
   static createShaders() {
     ShaderResources.mConstColorShader = new SimpleShader(kSimpleVS, kSimpleFS);
     ShaderResources.mTextureShader = new TextureShader(kTextureVS, kTextureFS);
+    ShaderResources.mSpriteShader = new SpriteShader(kTextureVS, kTextureFS);
   }
-  static getTextureShader() {
-    return ShaderResources.mTextureShader;
-  }
+  static getTextureShader = () => ShaderResources.mTextureShader;
   static getConstColorShader = () => ShaderResources.mConstColorShader;
+  static getSpriteShader = () => ShaderResources.mSpriteShader;
 }

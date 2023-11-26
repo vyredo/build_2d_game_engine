@@ -2,9 +2,12 @@ import { GLSys } from "../core/gl";
 import { ShaderResources } from "../core/ShaderResources";
 import { Transform } from "../transform";
 import { Camera } from "..";
+import type SimpleShader from "../shaders/SimpleShader";
+import type { TextureShader } from "../shaders/textureShader";
+import type { SpriteShader } from "../shaders/SpriteShader";
 
 class Renderable {
-  mShader = ShaderResources.getConstColorShader(); // the shader for shading this object
+  mShader: SimpleShader | TextureShader | SpriteShader | null = ShaderResources.getConstColorShader(); // the shader for shading this object
   mColor: number[] = [1, 1, 1, 1]; // color of pixel
   mXform: Transform = new Transform(); // transform operator
   constructor() {}
@@ -24,7 +27,7 @@ class Renderable {
   getXform() {
     return this.mXform;
   }
-  _setShader(shader: any) {
+  _setShader(shader: SimpleShader | TextureShader | SpriteShader) {
     this.mShader = shader;
   }
 }

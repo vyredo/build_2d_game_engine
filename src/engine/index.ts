@@ -13,6 +13,7 @@ import * as map from "./core/resourceMap";
 import audio from "./resources/audio";
 import texture from "./resources/texture";
 import { TextureRenderable } from "./renderable/textureRenderable";
+import { SpriteRenderable, eTexCoordArrayIndex } from "./renderable/spriteRenderable";
 
 // general engine utilities
 function init(htmlCanvasID: string) {
@@ -38,4 +39,21 @@ function cleanup() {
   GLSys.cleanup();
 }
 
-export { texture, TextureRenderable, audio, map, cleanup, Renderable, init, clearCanvas, Transform, Camera, input, text, xml, Scene };
+export {
+  SpriteRenderable,
+  eTexCoordArrayIndex,
+  texture,
+  TextureRenderable,
+  audio,
+  map,
+  cleanup,
+  Renderable,
+  init,
+  clearCanvas,
+  Transform,
+  Camera,
+  input,
+  text,
+  xml,
+  Scene,
+};
