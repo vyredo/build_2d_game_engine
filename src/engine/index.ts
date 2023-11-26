@@ -1,7 +1,7 @@
 // general utilities
 import { vertexBuffer } from "./core/VertexBuffer";
 import { GLSys } from "./core/gl";
-import Renderable from "./renderable";
+import Renderable from "./renderable/renderable";
 import { ShaderResources } from "./core/ShaderResources";
 import { Transform } from "./transform";
 import Camera from "./camera";
@@ -11,6 +11,8 @@ import Scene from "./scene";
 import loop from "./core/loop";
 import * as map from "./core/resourceMap";
 import audio from "./resources/audio";
+import texture from "./resources/texture";
+import { TextureRenderable } from "./renderable/textureRenderable";
 
 // general engine utilities
 function init(htmlCanvasID: string) {
@@ -36,4 +38,4 @@ function cleanup() {
   GLSys.cleanup();
 }
 
-export { audio, map, cleanup, Renderable, init, clearCanvas, Transform, Camera, input, text, xml, Scene };
+export { texture, TextureRenderable, audio, map, cleanup, Renderable, init, clearCanvas, Transform, Camera, input, text, xml, Scene };

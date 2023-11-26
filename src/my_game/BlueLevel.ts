@@ -1,5 +1,5 @@
 import * as engine from "../engine";
-import { SceneFileParser } from "./fileParser";
+import { SceneFileParser } from "./util/SceneFileParser";
 import { MyGame } from "./myGame";
 
 class BlueLevel extends engine.Scene {
@@ -8,6 +8,8 @@ class BlueLevel extends engine.Scene {
   mCamera: engine.Camera | null = null;
   mBackgroundAudio = "/assets/sounds/bg_clip.mp3";
   mCue = "/assets/sounds/blue_level_cue.wav";
+  kPortal = "/assets/minion_portal.jpg";
+  kCollector = "/assets/minion_collector.jpg";
 
   constructor() {
     super();
@@ -23,6 +25,7 @@ class BlueLevel extends engine.Scene {
 
     // Step B: Read all the squares
     sceneParser.parseSquares(this.mSQSet);
+    sceneParser.parseTextureSquares(this.mSQSet);
     engine.audio.playBackground(this.mBackgroundAudio, 0.5);
   }
   draw() {
@@ -62,11 +65,23 @@ class BlueLevel extends engine.Scene {
     }
 
     if (engine.input.isKeyPressed(engine.input.keys.Q)) this.stop(); // Quit the game
+
+    // continuously change texture tinting
+    let c = this.mSQSet[1].getColor();
+    let ca = c[3] + deltaX;
+    if (ca > 1) {
+      ca = 0;
+    }
+    c[3] = ca;
   }
   load() {
+    console.log("LOAD ASSETS >>> ");
     engine.xml.load(this.mSceneFile);
     engine.audio.load(this.mBackgroundAudio);
     engine.audio.load(this.mCue);
+
+    engine.texture.load(this.kPortal);
+    engine.texture.load(this.kCollector);
   }
 
   unload() {
@@ -76,6 +91,9 @@ class BlueLevel extends engine.Scene {
     engine.xml.unload(this.mSceneFile);
     engine.audio.unload(this.mBackgroundAudio);
     engine.audio.unload(this.mCue);
+
+    engine.texture.unload(this.kPortal);
+    engine.texture.unload(this.kCollector);
   }
   next() {
     super.next();

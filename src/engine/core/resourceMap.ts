@@ -16,7 +16,7 @@ class MapEntry {
 }
 
 let mMap = new Map();
-let mOutstandingPromises: Promise<any>[] = [];
+export let mOutstandingPromises: Promise<any>[] = [];
 
 export const has = (path: string) => mMap.has(path);
 export const get = (path: string) => {
@@ -24,8 +24,6 @@ export const get = (path: string) => {
   return mMap.get(path).getData();
 };
 export const set = (key: string, value: any) => {
-  console.log(`Setting ${key} to ${value}`);
-  console.log(mMap.get(key));
   mMap.get(key).setData(value);
 };
 export const loadRequested = (path: string) => mMap.set(path, new MapEntry(null));

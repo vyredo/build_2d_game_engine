@@ -1,16 +1,16 @@
-import { mat4 } from "../lib/gl-matrix";
-import { vertexBuffer } from "./core/VertexBuffer";
-import { GLSys } from "./core/gl";
-import { text } from "./resources";
+import { mat4 } from "../../lib/gl-matrix";
+import { vertexBuffer } from "../core/VertexBuffer";
+import { GLSys } from "../core/gl";
+import { text } from "../resources";
 
 export class SimpleShader {
-  private mCompiledShader: WebGLProgram | null = null;
-  private mVertexPositionRef: GLuint | null = null;
-  private mPixelColorRef: WebGLUniformLocation | null = null;
-  private mModelMatrixRef: WebGLUniformLocation | null = null;
-  private mCameraMatrixRef: WebGLUniformLocation | null = null;
-  private mVertexShader: WebGLShader | null = null;
-  private mFragmentShader: WebGLShader | null = null;
+  mCompiledShader: WebGLProgram | null = null;
+  mVertexPositionRef: GLuint | null = null;
+  mPixelColorRef: WebGLUniformLocation | null = null;
+  mModelMatrixRef: WebGLUniformLocation | null = null;
+  mCameraMatrixRef: WebGLUniformLocation | null = null;
+  mVertexShader: WebGLShader | null = null;
+  mFragmentShader: WebGLShader | null = null;
 
   constructor(vertexShaderFilePath: string, fragmentShaderFilePath: string) {
     const gl = GLSys.getGL();
@@ -79,6 +79,7 @@ export class SimpleShader {
     const gl = GLSys.getGL();
 
     const shaderSource = text.get(filePath);
+    if (!shaderSource) throw new Error(`Error getting shader source ${filePath}`);
 
     // create shader object
     const shader = gl.createShader(shaderType);

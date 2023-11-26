@@ -15,7 +15,6 @@ class Audio {
   decodeResource = (data: { arrayBuffer(): any }) => data.arrayBuffer();
   parseResource = (data: any) => {
     try {
-      console.log("decoding audio data", this.mAudioContext, data);
       return this.mAudioContext?.decodeAudioData(data);
     } catch (e: any) {
       console.error(e);

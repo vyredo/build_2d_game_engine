@@ -12,10 +12,10 @@ export class Transform {
   }
 
   getPosition = () => this.mPosition;
-  setPosition = (x: number, y: number) => {
+  setPosition(x: number, y: number) {
     this.setXPos(x);
     this.setYPos(y);
-  };
+  }
 
   getXpos = () => this.mPosition[0];
   setXPos = (x: number) => (this.mPosition[0] = x);

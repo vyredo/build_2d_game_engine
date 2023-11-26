@@ -8,9 +8,14 @@ export class MyGame extends engine.Scene {
   mCamera: engine.Camera | null = null;
   mSupport: engine.Renderable | null = null;
   mHero: engine.Renderable | null = null;
+  mPortal: engine.TextureRenderable | null = null;
+  mCollector: engine.TextureRenderable | null = null;
+
   mSceneFile = "/assets/scene.xml";
   mBackgroundAudio = "/assets/sounds/bg_clip.mp3";
   mCue = "/assets/sounds/my_game_cue.wav";
+  kPortal = "/assets/minion_portal.png";
+  kCollector = "/assets/minion_collector.png";
 
   constructor() {
     super();
@@ -24,11 +29,18 @@ export class MyGame extends engine.Scene {
       [20, 40, 600, 300] // viewport (orgX, orgY, width, height)
     );
     this.mCamera.setBackgroundColor([0.8, 0.8, 0.8, 1]);
-    // Step B: Create the support object in red
-    this.mSupport = new engine.Renderable();
-    this.mSupport.setColor([0.8, 0.2, 0.2, 1]);
-    this.mSupport.getXform().setPosition(20, 60);
-    this.mSupport.getXform().setSize(5, 5);
+
+    // Step B: Create the game objects
+    this.mPortal = new engine.TextureRenderable(this.kPortal);
+    this.mPortal.setColor([1, 0, 0, 0.2]); // tints red
+    this.mPortal.getXform().setPosition(25, 60);
+    this.mPortal.getXform().setSize(3, 3);
+
+    this.mCollector = new engine.TextureRenderable(this.kCollector);
+    this.mCollector.setColor([1, 1, 0, 0]); // No tinting
+    this.mCollector.getXform().setPosition(15, 60);
+    this.mCollector.getXform().setSize(3, 3);
+
     // Step C: Create the hero object in blue
     this.mHero = new engine.Renderable();
     this.mHero.setColor([0, 0, 1, 1]);
@@ -41,11 +53,17 @@ export class MyGame extends engine.Scene {
   load() {
     engine.audio.load(this.mBackgroundAudio);
     engine.audio.load(this.mCue);
+
+    engine.texture.load(this.kPortal);
+    engine.texture.load(this.kCollector);
   }
 
   unload() {
     engine.audio.unload(this.mBackgroundAudio);
     engine.audio.unload(this.mCue);
+
+    engine.texture.unload(this.kPortal);
+    engine.texture.unload(this.kCollector);
   }
 
   draw() {
@@ -54,8 +72,9 @@ export class MyGame extends engine.Scene {
     if (!this.mCamera) throw new Error("Camera not initialized");
     // Step  B: Activate the drawing Camera
     this.mCamera.setViewAndCameraMatrix();
+    this.mPortal?.draw(this.mCamera);
 
-    this.mSupport?.draw(this.mCamera);
+    this.mCollector?.draw(this.mCamera);
     this.mHero?.draw(this.mCamera);
   }
 
