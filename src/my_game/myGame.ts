@@ -9,6 +9,9 @@ export class MyGame extends engine.Scene {
   mSupport: engine.Renderable | null = null;
   mHero: engine.Renderable | null = null;
   mSceneFile = "/assets/scene.xml";
+  mBackgroundAudio = "/assets/sounds/bg_clip.mp3";
+  mCue = "/assets/sounds/my_game_cue.wav";
+
   constructor() {
     super();
   }
@@ -31,11 +34,19 @@ export class MyGame extends engine.Scene {
     this.mHero.setColor([0, 0, 1, 1]);
     this.mHero.getXform().setPosition(20, 60);
     this.mHero.getXform().setSize(2, 3);
+
+    engine.audio.playBackground(this.mBackgroundAudio, 1.0);
   }
 
-  load() {}
+  load() {
+    engine.audio.load(this.mBackgroundAudio);
+    engine.audio.load(this.mCue);
+  }
 
-  unload() {}
+  unload() {
+    engine.audio.unload(this.mBackgroundAudio);
+    engine.audio.unload(this.mCue);
+  }
 
   draw() {
     // Step A: clear the canvas
@@ -55,12 +66,19 @@ export class MyGame extends engine.Scene {
 
     // rotate the white square
     if (engine.input.isKeyPressed(engine.input.keys.Right)) {
+      // audio
+      engine.audio.playCue(this.mCue, 0.5);
+      engine.audio.incBackgroundVolume(0.05);
+
       xform.incXPosBy(deltaX);
       if (xform.getXpos() > 30) {
         // right bound of the window
         xform.setPosition(12, 60);
       }
     } else if (engine.input.isKeyPressed(engine.input.keys.Left)) {
+      engine.audio.playCue(this.mCue, 1.5);
+      engine.audio.incBackgroundVolume(-0.05);
+
       xform.incXPosBy(-deltaX);
       if (xform.getXpos() < 11) {
         // left bound of the window

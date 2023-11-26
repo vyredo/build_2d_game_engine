@@ -10,13 +10,15 @@ import { text, xml } from "./resources";
 import Scene from "./scene";
 import loop from "./core/loop";
 import * as map from "./core/resourceMap";
+import audio from "./resources/audio";
 
 // general engine utilities
-async function init(htmlCanvasID: string) {
+function init(htmlCanvasID: string) {
   GLSys.init(htmlCanvasID);
   vertexBuffer.init();
-  await ShaderResources.init();
+  ShaderResources.init();
   input.init();
+  audio.init();
 }
 
 function clearCanvas(color: [number, number, number, number]) {
@@ -27,10 +29,11 @@ function clearCanvas(color: [number, number, number, number]) {
 
 function cleanup() {
   loop.cleanup();
+  audio.cleanup();
   input.cleanup();
   ShaderResources.cleanup();
   vertexBuffer.cleanup();
   GLSys.cleanup();
 }
 
-export { map, cleanup, Renderable, init, clearCanvas, Transform, Camera, input, text, xml, Scene };
+export { audio, map, cleanup, Renderable, init, clearCanvas, Transform, Camera, input, text, xml, Scene };

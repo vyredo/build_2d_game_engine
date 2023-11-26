@@ -6,6 +6,9 @@ class BlueLevel extends engine.Scene {
   mSceneFile = "/assets/blue_level.xml";
   mSQSet: engine.Renderable[] = [];
   mCamera: engine.Camera | null = null;
+  mBackgroundAudio = "/assets/sounds/bg_clip.mp3";
+  mCue = "/assets/sounds/blue_level_cue.wav";
+
   constructor() {
     super();
     engine.xml.load(this.mSceneFile);
@@ -20,6 +23,7 @@ class BlueLevel extends engine.Scene {
 
     // Step B: Read all the squares
     sceneParser.parseSquares(this.mSQSet);
+    engine.audio.playBackground(this.mBackgroundAudio, 0.5);
   }
   draw() {
     if (!this.mCamera) throw new Error("Camera not initialized");
@@ -37,6 +41,8 @@ class BlueLevel extends engine.Scene {
 
     // Move right and swap over
     if (engine.input.isKeyPressed(engine.input.keys.Right)) {
+      engine.audio.playCue(this.mCue, 0.5);
+
       xform.incXPosBy(deltaX);
       if (xform.getXpos() > 30) {
         // this is the right-bound of the window
@@ -46,6 +52,8 @@ class BlueLevel extends engine.Scene {
 
     // test for white square movement
     if (engine.input.isKeyPressed(engine.input.keys.Left)) {
+      engine.audio.playCue(this.mCue, 1.0);
+
       xform.incXPosBy(-deltaX);
       if (xform.getXpos() < 11) {
         // this is the left-boundary
@@ -57,11 +65,17 @@ class BlueLevel extends engine.Scene {
   }
   load() {
     engine.xml.load(this.mSceneFile);
+    engine.audio.load(this.mBackgroundAudio);
+    engine.audio.load(this.mCue);
   }
 
   unload() {
-    // unload the scene flie and loaded resources
+    // stop the background audio
+    engine.audio.stopBackground();
+    // unload the scene file and loaded resources
     engine.xml.unload(this.mSceneFile);
+    engine.audio.unload(this.mBackgroundAudio);
+    engine.audio.unload(this.mCue);
   }
   next() {
     super.next();
