@@ -15,6 +15,14 @@ export class MyGame extends engine.Scene {
   mRightMinion: engine.SpriteAnimateRenderable | null = null;
   mLeftMinion: engine.SpriteAnimateRenderable | null = null;
 
+  mTextSysFont: engine.FontRenderable | null = null;
+  mTextCon16: engine.FontRenderable | null = null;
+  mTextCon24: engine.FontRenderable | null = null;
+  mTextCon32: engine.FontRenderable | null = null;
+  mTextCon72: engine.FontRenderable | null = null;
+  mTextSeg96: engine.FontRenderable | null = null;
+  mTextToWork: engine.FontRenderable | null = null;
+
   mSceneFile = "/assets/scene.xml";
   mBackgroundAudio = "/assets/sounds/bg_clip.mp3";
   mCue = "/assets/sounds/my_game_cue.wav";
@@ -22,6 +30,11 @@ export class MyGame extends engine.Scene {
   kFontImage = "/assets/consolas-72.png";
   kPortal = "/assets/minion_portal.png";
   kCollector = "/assets/minion_collector.png";
+  kFontCon16 = "assets/fonts/consolas-16"; // notice font names do not need extensions!
+  kFontCon24 = "assets/fonts/consolas-24";
+  kFontCon32 = "assets/fonts/consolas-32"; // this is also the default system font
+  kFontCon72 = "assets/fonts/consolas-72";
+  kFontSeg96 = "assets/fonts/segment7-96";
 
   constructor() {
     super();
@@ -69,7 +82,7 @@ export class MyGame extends engine.Scene {
 
     // right minion
     this.mRightMinion = new engine.SpriteAnimateRenderable(this.kMinionSprite);
-    this.mRightMinion.setColor([1, 0, 1, 1]);
+    this.mRightMinion.setColor([1, 0, 1, 0]);
     this.mRightMinion.getXform().setPosition(26, 56.5);
     this.mRightMinion.getXform().setSize(4, 3.2);
     this.mRightMinion.setSpriteSequence(
@@ -99,6 +112,32 @@ export class MyGame extends engine.Scene {
     this.mLeftMinion.setAnimationType(engine.eAnimationType.eRight);
     this.mLeftMinion.setAnimationSpeed(50);
 
+    // Create the fonts
+    this.mTextSysFont = new engine.FontRenderable("System Font: in Red");
+    this._initText(this.mTextSysFont, 50, 60, [1, 0, 0, 1], 3);
+
+    this.mTextCon16 = new engine.FontRenderable("Consolas 16: in black");
+    this.mTextCon16.setFontName(this.kFontCon16);
+    this._initText(this.mTextCon16, 50, 55, [0, 0, 0, 1], 2);
+
+    this.mTextCon24 = new engine.FontRenderable("Consolas 24: in black");
+    this.mTextCon24.setFontName(this.kFontCon24);
+    this._initText(this.mTextCon24, 50, 50, [0, 0, 0, 1], 3);
+
+    this.mTextCon32 = new engine.FontRenderable("Consolas 32: in white");
+    this.mTextCon32.setFontName(this.kFontCon32);
+    this._initText(this.mTextCon32, 40, 40, [1, 1, 1, 1], 4);
+
+    this.mTextCon72 = new engine.FontRenderable("Consolas 72: in blue");
+    this.mTextCon72.setFontName(this.kFontCon72);
+    this._initText(this.mTextCon72, 30, 30, [0, 0, 1, 1], 6);
+
+    this.mTextSeg96 = new engine.FontRenderable("Segment7-92");
+    this.mTextSeg96.setFontName(this.kFontSeg96);
+    this._initText(this.mTextSeg96, 30, 15, [1, 1, 0, 1], 7);
+
+    this.mTextToWork = this.mTextCon16;
+
     engine.audio.playBackground(this.mBackgroundAudio, 1.0);
   }
 
@@ -111,6 +150,12 @@ export class MyGame extends engine.Scene {
 
     engine.texture.load(this.kFontImage);
     engine.texture.load(this.kMinionSprite);
+
+    engine.font.load(this.kFontCon16);
+    engine.font.load(this.kFontCon24);
+    engine.font.load(this.kFontCon32);
+    engine.font.load(this.kFontCon72);
+    engine.font.load(this.kFontSeg96);
   }
 
   unload() {
@@ -122,6 +167,12 @@ export class MyGame extends engine.Scene {
 
     engine.texture.unload(this.kFontImage);
     engine.texture.unload(this.kMinionSprite);
+
+    engine.font.unload(this.kFontCon16);
+    engine.font.unload(this.kFontCon24);
+    engine.font.unload(this.kFontCon32);
+    engine.font.unload(this.kFontCon72);
+    engine.font.unload(this.kFontSeg96);
   }
 
   draw() {
@@ -139,6 +190,15 @@ export class MyGame extends engine.Scene {
     this.mFontImage?.draw(this.mCamera);
     this.mRightMinion?.draw(this.mCamera);
     this.mLeftMinion?.draw(this.mCamera);
+
+    // font
+    // drawing the text output
+    this.mTextSysFont?.draw(this.mCamera);
+    this.mTextCon16?.draw(this.mCamera);
+    this.mTextCon24?.draw(this.mCamera);
+    this.mTextCon32?.draw(this.mCamera);
+    this.mTextCon72?.draw(this.mCamera);
+    this.mTextSeg96?.draw(this.mCamera);
   }
 
   update() {
@@ -236,12 +296,56 @@ export class MyGame extends engine.Scene {
       this.mRightMinion.incAnimationSpeed(2);
       this.mLeftMinion.incAnimationSpeed(2);
     }
+
+    /** =================== FONT UPDATE ============================== */
+    // choose which text to work on
+    if (engine.input.isKeyClicked(engine.input.keys.Zero)) {
+      this.mTextToWork = this.mTextCon16;
+    }
+    if (engine.input.isKeyClicked(engine.input.keys.One)) {
+      this.mTextToWork = this.mTextCon24;
+    }
+    if (engine.input.isKeyClicked(engine.input.keys.Three)) {
+      this.mTextToWork = this.mTextCon32;
+    }
+    if (engine.input.isKeyClicked(engine.input.keys.Four)) {
+      this.mTextToWork = this.mTextCon72;
+    }
+
+    if (!this.mTextToWork) return;
+    if (!this.mTextSysFont) return;
+    let deltaF = 0.005;
+    if (engine.input.isKeyPressed(engine.input.keys.Up)) {
+      if (engine.input.isKeyPressed(engine.input.keys.X)) {
+        this.mTextToWork.getXform().incWidthBy(deltaF);
+      }
+      if (engine.input.isKeyPressed(engine.input.keys.Y)) {
+        this.mTextToWork.getXform().incHeightBy(deltaF);
+      }
+      this.mTextSysFont.setText(this.mTextToWork.getXform().getWidth().toFixed(2) + "x" + this.mTextToWork.getXform().getHeight().toFixed(2));
+    }
+
+    if (engine.input.isKeyPressed(engine.input.keys.Down)) {
+      if (engine.input.isKeyPressed(engine.input.keys.X)) {
+        this.mTextToWork.getXform().incWidthBy(-deltaF);
+      }
+      if (engine.input.isKeyPressed(engine.input.keys.Y)) {
+        this.mTextToWork.getXform().incHeightBy(-deltaF);
+      }
+      this.mTextSysFont.setText(this.mTextToWork.getXform().getWidth().toFixed(2) + "x" + this.mTextToWork.getXform().getHeight().toFixed(2));
+    }
   }
 
   next() {
     super.next();
     const nextLevel = new BlueLevel();
     nextLevel.start();
+  }
+
+  _initText(font: engine.FontRenderable, posX: number, posY: number, color: [number, number, number, number], textH: number) {
+    font.setColor(color);
+    font.getXform().setPosition(posX, posY);
+    font.setTextHeight(textH);
   }
 }
 

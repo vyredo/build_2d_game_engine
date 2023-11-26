@@ -30,6 +30,8 @@ export const keys = {
   Q: 81,
   R: 82,
   S: 83,
+  X: 88,
+  Y: 89,
   W: 87,
   LastKeyCode: 222,
 };

@@ -15,6 +15,9 @@ import texture from "./resources/texture";
 import { TextureRenderable } from "./renderable/textureRenderable";
 import { SpriteRenderable, eTexCoordArrayIndex } from "./renderable/spriteRenderable";
 import { SpriteAnimateRenderable, eAnimationType } from "./renderable/spriteAnimateRenderable";
+import font from "./resources/font";
+import defaultResources from "./resources/defaultResources";
+import { FontRenderable } from "./renderable/fontRenderable";
 
 // general engine utilities
 function init(htmlCanvasID: string) {
@@ -23,6 +26,7 @@ function init(htmlCanvasID: string) {
   ShaderResources.init();
   input.init();
   audio.init();
+  defaultResources.init();
 }
 
 function clearCanvas(color: [number, number, number, number]) {
@@ -38,6 +42,7 @@ function cleanup() {
   ShaderResources.cleanup();
   vertexBuffer.cleanup();
   GLSys.cleanup();
+  defaultResources.cleanup();
 }
 
 export {
@@ -59,4 +64,7 @@ export {
   text,
   xml,
   Scene,
+  font,
+  FontRenderable,
+  defaultResources,
 };
