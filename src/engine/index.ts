@@ -14,6 +14,7 @@ import audio from "./resources/audio";
 import texture from "./resources/texture";
 import { TextureRenderable } from "./renderable/textureRenderable";
 import { SpriteRenderable, eTexCoordArrayIndex } from "./renderable/spriteRenderable";
+import { SpriteAnimateRenderable, eAnimationType } from "./renderable/spriteAnimateRenderable";
 
 // general engine utilities
 function init(htmlCanvasID: string) {
@@ -40,6 +41,8 @@ function cleanup() {
 }
 
 export {
+  SpriteAnimateRenderable,
+  eAnimationType,
   SpriteRenderable,
   eTexCoordArrayIndex,
   texture,

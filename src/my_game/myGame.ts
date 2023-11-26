@@ -12,6 +12,8 @@ export class MyGame extends engine.Scene {
   mCollector: engine.SpriteRenderable | null = null;
   mFontImage: engine.SpriteRenderable | null = null;
   mMinion: engine.SpriteRenderable | null = null;
+  mRightMinion: engine.SpriteAnimateRenderable | null = null;
+  mLeftMinion: engine.SpriteAnimateRenderable | null = null;
 
   mSceneFile = "/assets/scene.xml";
   mBackgroundAudio = "/assets/sounds/bg_clip.mp3";
@@ -65,6 +67,38 @@ export class MyGame extends engine.Scene {
     this.mHero.getXform().setSize(2, 3);
     this.mHero.setElementPixelPositions(0, 120, 0, 180);
 
+    // right minion
+    this.mRightMinion = new engine.SpriteAnimateRenderable(this.kMinionSprite);
+    this.mRightMinion.setColor([1, 0, 1, 1]);
+    this.mRightMinion.getXform().setPosition(26, 56.5);
+    this.mRightMinion.getXform().setSize(4, 3.2);
+    this.mRightMinion.setSpriteSequence(
+      512,
+      0, // first element pixel positions: top: 512 left: 0
+      204,
+      164, // widthxheight in pixels
+      5, // number of elements in this sequence
+      0
+    ); // horizontal padding in between
+    this.mRightMinion.setAnimationType(engine.eAnimationType.eRight);
+    this.mRightMinion.setAnimationSpeed(50);
+
+    // the left minion
+    this.mLeftMinion = new engine.SpriteAnimateRenderable(this.kMinionSprite);
+    this.mLeftMinion.setColor([1, 1, 1, 0]);
+    this.mLeftMinion.getXform().setPosition(15, 56.5);
+    this.mLeftMinion.getXform().setSize(4, 3.2);
+    this.mLeftMinion.setSpriteSequence(
+      348,
+      0, // first element pixel positions: top: 164 left: 0
+      204,
+      164, // widthxheight in pixels
+      5, // number of elements in this sequence
+      0
+    );
+    this.mLeftMinion.setAnimationType(engine.eAnimationType.eRight);
+    this.mLeftMinion.setAnimationSpeed(50);
+
     engine.audio.playBackground(this.mBackgroundAudio, 1.0);
   }
 
@@ -96,46 +130,53 @@ export class MyGame extends engine.Scene {
     if (!this.mCamera) throw new Error("Camera not initialized");
     // Step  B: Activate the drawing Camera
     this.mCamera.setViewAndCameraMatrix();
-    this.mPortal?.draw(this.mCamera);
 
+    // this.mMinion?.draw(this.mCamera);
+
+    this.mPortal?.draw(this.mCamera);
     this.mCollector?.draw(this.mCamera);
     this.mHero?.draw(this.mCamera);
     this.mFontImage?.draw(this.mCamera);
-    this.mMinion?.draw(this.mCamera);
+    this.mRightMinion?.draw(this.mCamera);
+    this.mLeftMinion?.draw(this.mCamera);
   }
 
   update() {
+    if (!this.mCamera) throw new Error("Camera not initialized");
     if (!this.mHero) throw new Error("Hero not initialized");
+    if (!this.mPortal) throw new Error("Portal not initialized");
+    if (!this.mFontImage) throw new Error("Font image not initialized");
+    if (!this.mRightMinion) throw new Error("Right minion not initialized");
+    if (!this.mLeftMinion) throw new Error("Left minion not initialized");
+
+    // let's only allow the movement of hero,
+    let deltaX = 0.05;
     let xform = this.mHero.getXform();
-    const deltaX = 0.05;
 
-    // rotate the white square
+    // Support hero movements
     if (engine.input.isKeyPressed(engine.input.keys.Right)) {
-      // audio
-      engine.audio.playCue(this.mCue, 0.5);
-      engine.audio.incBackgroundVolume(0.05);
-
       xform.incXPosBy(deltaX);
       if (xform.getXpos() > 30) {
-        // right bound of the window
+        // this is the right-bound of the window
         xform.setPosition(12, 60);
       }
-    } else if (engine.input.isKeyPressed(engine.input.keys.Left)) {
-      engine.audio.playCue(this.mCue, 1.5);
-      engine.audio.incBackgroundVolume(-0.05);
+    }
 
+    if (engine.input.isKeyPressed(engine.input.keys.Left)) {
       xform.incXPosBy(-deltaX);
-      if (xform.getXpos() < 11) {
-        // left bound of the window
-        this.next();
+      if (xform.getYpos() < 11) {
+        // this is the left-bound of the window
+        xform.setXPos(20);
       }
-    } else if (engine.input.isKeyPressed(engine.input.keys.Q)) {
-      this.stop();
     }
 
-    if (engine.input.isKeyPressed(engine.input.keys.Up)) {
-      xform.incRotationByDegree(1);
+    // continuously change texture tinting
+    let c = this.mPortal.getColor();
+    let ca = c[3] + deltaX;
+    if (ca > 1) {
+      ca = 0;
     }
+    c[3] = ca;
 
     // New update code for changing the sub-texture regions being shown"
     let deltaT = 0.001;
@@ -143,7 +184,6 @@ export class MyGame extends engine.Scene {
     // The font image:
     // zoom into the texture by updating texture coordinate
     // For font: zoom to the upper left corner by changing bottom right
-    if (!this.mFontImage) throw new Error("Font image not initialized");
     let texCoord = this.mFontImage.getElementUVCoordinateArray();
     // The 8 elements:
     //      mTexRight,  mTexTop,          // x,y of top-right
@@ -161,26 +201,41 @@ export class MyGame extends engine.Scene {
     this.mFontImage.setElementUVCoordinate(texCoord[engine.eTexCoordArrayIndex.eLeft], r, b, texCoord[engine.eTexCoordArrayIndex.eTop]);
     //
 
-    // The minion image:
-    // For minion: zoom to the bottom right corner by changing top left
-    if (!this.mMinion) throw new Error("Minion not initialized");
-    texCoord = this.mMinion.getElementUVCoordinateArray();
-    // The 8 elements:
-    //      mTexRight,  mTexTop,          // x,y of top-right
-    //      mTexLeft,   mTexTop,
-    //      mTexRight,  mTexBottom,
-    //      mTexLeft,   mTexBottom
-    let t = texCoord[engine.eTexCoordArrayIndex.eTop] - deltaT;
-    let l = texCoord[engine.eTexCoordArrayIndex.eLeft] + deltaT;
+    // New code for controlling the sprite animation
+    // controlling the sprite animation:
+    // remember to update the minion's animation
+    this.mRightMinion.updateAnimation();
+    this.mLeftMinion.updateAnimation();
 
-    if (l > 0.5) {
-      l = 0;
-    }
-    if (t < 0.5) {
-      t = 1.0;
+    // Animate left on the sprite sheet
+    if (engine.input.isKeyClicked(engine.input.keys.One)) {
+      this.mRightMinion.setAnimationType(engine.eAnimationType.eLeft);
+      this.mLeftMinion.setAnimationType(engine.eAnimationType.eLeft);
     }
 
-    this.mMinion.setElementUVCoordinate(l, texCoord[engine.eTexCoordArrayIndex.eRight], texCoord[engine.eTexCoordArrayIndex.eBottom], t);
+    // swing animation
+    if (engine.input.isKeyClicked(engine.input.keys.Two)) {
+      this.mRightMinion.setAnimationType(engine.eAnimationType.eSwing);
+      this.mLeftMinion.setAnimationType(engine.eAnimationType.eSwing);
+    }
+
+    // Animate right on the sprite sheet
+    if (engine.input.isKeyClicked(engine.input.keys.Three)) {
+      this.mRightMinion.setAnimationType(engine.eAnimationType.eRight);
+      this.mLeftMinion.setAnimationType(engine.eAnimationType.eRight);
+    }
+
+    // decrease the duration of showing each sprite element, thereby speeding up the animation
+    if (engine.input.isKeyClicked(engine.input.keys.Four)) {
+      this.mRightMinion.incAnimationSpeed(-2);
+      this.mLeftMinion.incAnimationSpeed(-2);
+    }
+
+    // increase the duration of showing each sprite element, thereby slowing down the animation
+    if (engine.input.isKeyClicked(engine.input.keys.Five)) {
+      this.mRightMinion.incAnimationSpeed(2);
+      this.mLeftMinion.incAnimationSpeed(2);
+    }
   }
 
   next() {
